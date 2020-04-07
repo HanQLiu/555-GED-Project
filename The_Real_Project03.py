@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[37]:
+
+
 """The Brand New Project 03 With Better Data Structure And Better Visual"""
 """Please Make Code As Minimalist As Possible"""
 from prettytable import PrettyTable
@@ -375,22 +381,19 @@ def no_bigamy(family_dict, individual_dict):
             # correct their family in individual_dict and delete the second family from family_dict
             # set fams of the unlucky bast**d to NA
             ErrorCollector.error_list.append(f"ERROR: US11: {key} committed bigamy and the second family {value[1]} will be eliminated.")
-            individual_dict[key].fams = value[0]
-            del family_dict[value[1]]
-            for key2, value2 in individual_dict.items():
-                if value2.fams == value[1]:
-                    value2.fams = 'NA'
-
+            
 '''User Story 12: Parents Not Too Old'''
 def parents_not_too_old(family_dict, individual_dict):
     for id, individual in individual_dict.items():
-        #print(id, individual)
         if individual.famc != 'NA':
             dad = family_dict[individual.famc].husb
             mom = family_dict[individual.famc].wife
-
-            how_much_older_is_dad = age_calculator(individual.birt, individual_dict[dad].birt)
-            how_much_older_is_mom = age_calculator(individual.birt, individual_dict[mom].birt)
+            how_much_older_is_dad = 'NA'
+            how_much_older_is_mom = 'NA'
+            if dad != 'NA':
+                how_much_older_is_dad = age_calculator(individual.birt, individual_dict[dad].birt)
+            if mom != 'NA':
+                how_much_older_is_mom = age_calculator(individual.birt, individual_dict[mom].birt)
             if how_much_older_is_dad != 'NA' and how_much_older_is_dad >= 80:
                 ErrorCollector.error_list.append(f"ERROR: US12: {id} has a father who is {how_much_older_is_dad} older which is more than 80 and birthday is set to NA")
                 individual_dict[dad].birt.setNA()
@@ -407,10 +410,13 @@ def siblings_spacing(family_dict, individual_dict):
             if len(siblings) != 1:
                 for child in siblings:
                     if individual_dict[child].birt.year != 'NA' and individual_dict[child].birt.month != 'NA' and individual_dict[child].birt.day != 'NA' and individual.birt.year != 'NA' and individual.birt.month != 'NA' and individual.birt.day != 'NA':
-                        sib_age = date(int(float(individual_dict[child].birt.year)), int(float(individual_dict[child].birt.month)), int(float(individual_dict[child].birt.day)))
-                        self_age = date(int(float(individual.birt.year)), int(float(individual.birt.month)), int(float(individual.birt.day)))
+                        sib_age = date(int(float(individual_dict[child].birt.year)), int(float(individual_dict[child].birt.month)),
+                                       int(float(individual_dict[child].birt.day)))
+                        self_age = date(int(float(individual.birt.year)), int(float(individual.birt.month)),
+                                        int(float(individual.birt.day)))
                         difference = abs(self_age - sib_age).days
                         '''8 months is 240 days '''
+                        #print(difference)
                         if difference > 1 and difference < 240:
                             ErrorCollector.error_list.append(f"ERROR: US13: {id} has a sibling whose birth date is too close")
 
@@ -429,12 +435,63 @@ def mutiple_birth(family_dict, individual_dict):
                         self_age = date(int(float(individual.birt.year)), int(float(individual.birt.month)),
                                         int(float(individual.birt.day)))
                         difference = abs(self_age - sib_age).days
-                        '''8 months is 240 days '''
                         if difference <= 1:
                             birth += 1
                         if birth > 5:
                             ErrorCollector.error_list.append(f"ERROR: US14: {id} has too many siblings born at the same time")
                             break
+
+"""User story 18: sibling should not marry"""
+def sibling_not_marry(family_dict, individual_dict):
+    for id, individual in individual_dict.items():
+        partner = 'NA'
+        if individual.famc != 'NA' and individual.fams != 'NA':
+            if individual.sex == 'M':
+                partnerid = family_dict[individual.fams].wife
+            else:
+                partnerid = family_dict[individual.fams].husb
+            if partnerid != 'NA':
+                partner = individual_dict[partnerid]
+                if individual.famc == partner.famc:
+                    ErrorCollector.error_list.append(f"ERROR: US18: {id} should not marry with sibling {partnerid}")
+        
+"""User story 19: first cousin not marry"""
+def first_cousin_not_marry(family_dict, individual_dict):
+    def find_grandparents(family_dict, individual_dict, individual):
+        gffID = 'NA'
+        gfmID = 'NA'
+        gmfID = 'NA'
+        gmmID = 'NA'
+        if individual.famc != 'NA':
+            fatherID = family_dict[individual.famc].husb
+            motherID = family_dict[individual.famc].wife
+            if fatherID != 'NA':
+                father = individual_dict[fatherID]
+                if father.famc != 'NA':
+                    gffID = family_dict[father.famc].husb
+                    gfmID = family_dict[father.famc].wife
+            if motherID != 'NA':
+                mother = individual_dict[motherID]
+                if mother.famc != 'NA':
+                    gmfID = family_dict[mother.famc].husb
+                    gmmID = family_dict[mother.famc].wife
+        return gffID, gfmID, gmfID, gmmID
+    
+    for id, individual in individual_dict.items():
+        partner = 'NA'
+        if individual.famc != 'NA' and individual.fams != 'NA':
+            if individual.sex == 'M':
+                partnerid = family_dict[individual.fams].wife
+            else:
+                partnerid = family_dict[individual.fams].husb
+            if partnerid != 'NA':
+                partner = individual_dict[partnerid]
+                indigp = find_grandparents(family_dict, individual_dict, individual)
+                partgp = find_grandparents(family_dict, individual_dict, partner)
+                for i in range(4):
+                    if indigp[i] == partgp[i] and indigp[i] != 'NA':
+                        ErrorCollector.error_list.append(f"ERROR: US19: {id} should not marry his cousin {partnerid}")
+                        break
 
 
 """Shengda's Code Goes Here"""
@@ -507,8 +564,7 @@ def marriage_after_14(family_dict, individual_dict):
             husband_birth_day = individual_dict[husband_ID].birt.snake_year_month_day()
             wife_birth_day = individual_dict[wife_ID].birt.snake_year_month_day()
 
-            if calculate_year_dif(husband_birth_day, marriage_date) >= 14\
-                and calculate_year_dif(wife_birth_day, marriage_date) >= 14:
+            if calculate_year_dif(husband_birth_day, marriage_date) >= 14                and calculate_year_dif(wife_birth_day, marriage_date) >= 14:
                 US10_report[fam] = True
             else:
                 US10_report[fam] = [marriage_date, husband_birth_day, wife_birth_day]
@@ -624,8 +680,7 @@ def unique_families_by_spouses(family_dict, individual_dict):
 
             if marriage_date != 'NA':
                 if marriage_date in US24_report.keys():
-                    if US24_report[marriage_date][0] == husband_name\
-                        or US24_report[marriage_date][1] == wife_name:
+                    if US24_report[marriage_date][0] == husband_name                        or US24_report[marriage_date][1] == wife_name:
                         ErrorCollector.error_list.append(f"ERROR: US24: family id is {fam}, husband name  is {husband_name}, "
                                                          f"wife name is {wife_name}, marriage date is {marriage_date}, is not unique Families By Spouses")
                 else:
@@ -779,11 +834,14 @@ def main():
     List_recent_deaths(individual_dict)
 
     '''Haoran Sprint 1: US11, US12'''
-    #no_bigamy(family_dict, individual_dict) # US11
-    #parents_not_too_old(family_dict, individual_dict) # US12
+    no_bigamy(family_dict, individual_dict) # US11
+    parents_not_too_old(family_dict, individual_dict) # US12
     '''Haoran Sprint 2: US13, US14'''
     siblings_spacing(family_dict, individual_dict) # US13
     mutiple_birth(family_dict, individual_dict) # US14
+    '''Haoran Sprint 3: US18, US19'''
+    sibling_not_marry(family_dict, individual_dict) # US18
+    first_cousin_not_marry(family_dict, individual_dict) # US19
 
     '''Xiangyu Sprint 1: US15, US24'''
     fewer_than_15_siblings(family_dict) # US15
@@ -817,3 +875,16 @@ def main():
 """Run Main Function"""
 if __name__ == '__main__':
     main()
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
