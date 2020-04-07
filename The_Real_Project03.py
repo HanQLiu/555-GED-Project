@@ -299,16 +299,40 @@ def unique_ids(unfiltered_file):
 '''Sprint 3'''
 '''User Story 25: Unique first names in families'''
 def unique_first_name(family_dict, individual_dict):
-    whole_family = []
-    for i in family_dict:
-        list_first_name = []
-        for j in i[5]:
-            for k in individual_dict:
-                if k[0] == j:
-                    list_first_name.append(k[1])
-            set(list_first_name)
-            whole_family.append(list_first_name)
-    return whole_family
+    cnames = []
+    temp = True
+    cids = []
+    for famid, famvalue in family_dict.items():
+        if famvalue.__contains__("CHIL"):
+            cids = famvalue["CHIL"]
+
+            for index in range(0, len(family_dict[famid]["CHIL"])):
+                cid = family_dict[famid]["CHIL"][index][0]
+                if cid in individual_dict.keys():
+                    child_name = individual_dict[cid]["NAME"]
+                    cnames.append(child_name)
+   
+        i = 0
+
+        if len(cnames) > 1:
+            while i < len(cnames):
+                j = i + 1
+                while j < len(cnames):
+
+                    name_1 = Individual.__init__(cnames[i][0])
+                    name_2 = Individual.__init__(cnames[j][0])
+
+                    if name_1 == name_2:
+                        ErrorCollector.error_list.append(f"Error: US25: Family has children {cnames[i][1]} which are repeating")
+                        temp = False
+                        return temp
+
+                    j += 1
+                i += 1
+        cnames.clear()
+
+    return temp
+
 
 
 '''User Story 27: Include individual ages'''
