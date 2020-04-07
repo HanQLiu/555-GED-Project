@@ -336,10 +336,10 @@ def unique_first_name(family_dict, individual_dict):
 
 
 '''User Story 27: Include individual ages'''
-def include_individual_ages(individual_list):
+def include_individual_ages(individual_dict):
     list_age = list()
     count = 0
-    for i in individual_list:
+    for i in individual_dict:
         age = age_calculator(i[3], i[4])
         list_age.append([i[0],age])
         count += 1
