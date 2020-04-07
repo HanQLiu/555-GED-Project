@@ -869,7 +869,7 @@ def main():
         print(error)
 
     # 6. Export for testing
-    return [individual_dict, family_dict]
+    return ErrorCollector
 
 
 """Run Main Function"""
