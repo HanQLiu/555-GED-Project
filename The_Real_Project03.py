@@ -71,6 +71,23 @@ def age_calculator(later_date, earlier_date):
             return 'NA'
         else:
             return age_difference(later_date, earlier_date)
+'''Days Calculator'''
+def days_calculator(later_date, earlier_date):
+    y_l, m_l, d_l = later_date.year, later_date.month, later_date.day
+    y_e, m_e, d_e = earlier_date.year, earlier_date.month, earlier_date.day
+    def days_difference():
+        delta = date(int(y_l), int(m_l), int(d_l)) - date(int(y_e), int(m_e), int(d_e))
+        return delta.days
+    if isinstance(later_date, date):
+        if earlier_date.snake_year_month_day() == 'NA':
+            return 'NA'
+        else:
+            return days_difference()
+    else:
+        if later_date.snake_year_month_day() == 'NA' or earlier_date.snake_year_month_day() == 'NA':
+            return 'NA'
+        else:
+            return days_difference()
 
 '''Individual & Family Dictionary Constructor'''
 def raw_individuals_to_structured_dict(raw_individuals, individual_dict):
@@ -134,7 +151,7 @@ def draw_family_prettytable(family_dict, individual_dict):
     pt.field_names = ["ID", "Married", "Divorced", "Husband ID", "Husband Name", "Wife ID", "Wife Name", "Children"]
     for id, family in family_dict.items():
         '''marr, husb, wife, chil, div'''
-        pt.add_row([id, family.marr.snake_year_month_day(), family.div.snake_year_month_day(), family.husb, individual_dict[family.husb].name, family.wife, individual_dict[family.wife].name if family.wife != 'NA' else 'NA', family.chil])
+        pt.add_row([id, family.marr.snake_year_month_day(), family.div.snake_year_month_day(), family.husb, individual_dict[family.husb].name if family.husb != 'NA' else 'NA', family.wife, individual_dict[family.wife].name if family.wife != 'NA' else 'NA', family.chil])
     print(pt)
 
 '''File Filter'''
@@ -235,6 +252,33 @@ def birth_before_marriage_of_parents(individual_dict, family_dict):
                     ErrorCollector.error_list.append(f"ERROR: US08: Individual {id} has a birth date {value.birt.snake_year_month_day()} that's earlier than parents' wedding date {family_dict[value.famc].marr.snake_year_month_day()}. Birthday was set to NA.")
                     # value.birt.setNA()
 
+'''Sprint 3'''
+'''US09 Birth before Parents' Death'''
+def birth_before_parents_death(individual_dict, family_dict):
+    for id, individual in individual_dict.items():
+        if individual.famc != 'NA':
+            father = family_dict[individual.famc].husb
+            mother = family_dict[individual.famc].wife
+            if father != 'NA' and mother != 'NA':
+                father_death = individual_dict[father].deat
+                mother_death = individual_dict[mother].deat
+                if father_death.snake_year_month_day() != 'NA' and days_calculator(individual.birt, father_death) != 'NA':
+                    if days_calculator(individual.birt, father_death) > 274:
+                        ErrorCollector.error_list.append(f"ERROR: US09: Individual {id} has a birthday happens 9 months after father's death.")
+                if mother_death.snake_year_month_day() != 'NA' and days_calculator(individual.birt, father_death) != 'NA':
+                    if days_calculator(individual.birt, mother_death) > 0:
+                        ErrorCollector.error_list.append(f"ERROR: US09: Individual {id} has a birthday after mother's death.")
+
+'''US16 Male Last Names'''
+def male_last_names(individual_dict, family_dict):
+    for id, family in family_dict.items():
+        husb_lastname = individual_dict[family.husb].name.replace('/', '').split(' ')[1]
+        if family.chil != 'NA':
+            for child in family.chil:
+                if individual_dict[child].sex == 'M':
+                    child_lastname = individual_dict[child].name.replace('/', '').split(' ')[1]
+                    if child_lastname != husb_lastname:
+                        ErrorCollector.error_list.append(f"ERROR: US16: Family {id} has a male child has a last name {child_lastname} instead of {husb_lastname}.")
 
 """Jigar's Code Goes Here"""
 '''Sprint 1'''
@@ -713,6 +757,9 @@ def main():
     '''Hanqing Sprint 2: US03, US08'''
     birth_before_death(individual_dict) # US03
     birth_before_marriage_of_parents(individual_dict, family_dict) # US08
+    '''Hanqing Sprint 3: US09, US16'''
+    birth_before_parents_death(individual_dict, family_dict) # US09
+    male_last_names(individual_dict, family_dict) #US16
 
     '''Jigar Sprint 1: US04, US06'''
     marriage_before_divorce(family_dict) # US04
