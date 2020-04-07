@@ -359,8 +359,16 @@ def unique_ids(unfiltered_file):
                         ErrorCollector.error_list.append(f"ERROR: US22: Family {id} already exists and will override previous data")
                     else:
                         families.append(id)
+                        
+'''Sprint 3'''
+'''User Story 25: Unique first names in families'''
+# def unique_first_name(family_dict, individual_dict):
 
+    
+'''User Story 27: Unique first names in families'''
+# def include_individual_ages(individual_dict):
 
+    
 """Haoran's Code Goes Here"""
 '''Sprint 1'''
 '''User Story 11: No Bigamy'''
@@ -822,6 +830,9 @@ def main():
     '''Jigar Sprint 2: US17, US22'''
     no_marriage_to_children(family_dict, individual_dict) # US17
     unique_ids(unfiltered_file) #US22
+    '''Jigar Sprint 3: US25, US27'''
+    # unique_first_name(family_dict, individual_dict) #US25
+    # include_individual_ages(individual_dict) #US27
 
     '''Shengda Sprint 1: US05, US07'''
     marriage_before_death(family_dict, individual_dict) # US05
