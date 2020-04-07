@@ -362,7 +362,16 @@ def unique_ids(unfiltered_file):
                         
 '''Sprint 3'''
 '''User Story 25: Unique first names in families'''
-# def unique_first_name(family_dict, individual_dict):
+def unique_first_name(family_dict, individual_dict):
+        for fam_id, family in family_dict.items():
+        if family.chil != 'NA':
+            first_names = []
+            for family_child in family.chil:
+                first_name = individual_dict[family_child].name.split('')[0]
+                if first_name not in first_names:
+                    first_names.append(first_name)
+                else:
+                    ErrorCollector.error_list.append(f"Error: US25: Family {fam_id} has multiple children with first name {first_name}.")
 
     
 '''User Story 27: Unique first names in families'''
@@ -831,7 +840,7 @@ def main():
     no_marriage_to_children(family_dict, individual_dict) # US17
     unique_ids(unfiltered_file) #US22
     '''Jigar Sprint 3: US25, US27'''
-    # unique_first_name(family_dict, individual_dict) #US25
+    unique_first_name(family_dict, individual_dict) #US25
     # include_individual_ages(individual_dict) #US27
 
     '''Shengda Sprint 1: US05, US07'''
