@@ -303,7 +303,7 @@ def unique_first_name(family_dict, individual_dict):
     temp = True
     cids = []
     for famid, famvalue in family_dict.items():
-        if famvalue.__contains__("CHIL"):
+        if famvalue.__init__("CHIL"):
             cids = famvalue["CHIL"]
 
             for index in range(0, len(family_dict[famid]["CHIL"])):
