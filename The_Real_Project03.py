@@ -363,11 +363,11 @@ def unique_ids(unfiltered_file):
 '''Sprint 3'''
 '''User Story 25: Unique first names in families'''
 def unique_first_name(family_dict, individual_dict):
-        for fam_id, family in family_dict.items():
+    for fam_id, family in family_dict.items():
         if family.chil != 'NA':
             first_names = []
             for family_child in family.chil:
-                first_name = individual_dict[family_child].name.split('')[0]
+                first_name = individual_dict[family_child].name.split(' ')[0]
                 if first_name not in first_names:
                     first_names.append(first_name)
                 else:
@@ -379,8 +379,8 @@ def include_individual_ages(individual_dict):
     id_age_list = []
     for id, individual in individual_dict.items():
         id_age_list.append(f"{id} is {age_calculator(date.today(), individual.birt)} years old.")
-        for item in id_age_list:
-            print(item)
+    for item in id_age_list:
+        print(item)
 
     
 """Haoran's Code Goes Here"""
