@@ -281,10 +281,71 @@ def male_last_names(individual_dict, family_dict):
         husb_lastname = individual_dict[family.husb].name.replace('/', '').split(' ')[1]
         if family.chil != 'NA':
             for child in family.chil:
-                if individual_dict[child].sex == 'M':
-                    child_lastname = individual_dict[child].name.replace('/', '').split(' ')[1]
-                    if child_lastname != husb_lastname:
-                        ErrorCollector.error_list.append(f"ERROR: US16: Family {id} has a male child has a last name {child_lastname} instead of {husb_lastname}.")
+                if child in individual_dict:
+                    if individual_dict[child].sex == 'M':
+                        child_lastname = individual_dict[child].name.replace('/', '').split(' ')[1]
+                        if child_lastname != husb_lastname:
+                            ErrorCollector.error_list.append(f"ERROR: US16: Family {id} has a male child has a last name {child_lastname} instead of {husb_lastname}.")
+
+'''Sprint 4'''
+'''US23 Unique Name and Birth Date'''
+def unique_name_and_birth_date(individual_dict):
+    name_id_dict = {}
+    for id, individual in individual_dict.items():
+        name = individual.name.replace('/', '')
+        if name not in name_id_dict:
+            name_id_dict[name] = [id]
+        else:
+            name_id_dict[name].append(id)
+    for name, id_list in name_id_dict.items():
+        if len(id_list) > 1:
+            birthdays = {}
+            for id in id_list:
+                if individual_dict[id].birt.snake_year_month_day() != 'NA':
+                    if individual_dict[id].birt.snake_year_month_day() not in birthdays:
+                        birthdays[individual_dict[id].birt.snake_year_month_day()] = [id]
+                    else:
+                        birthdays[individual_dict[id].birt.snake_year_month_day()].append(id)
+            for birthday, id_list in birthdays.items():
+                if len(id_list) > 1:
+                    ErrorCollector.error_list.append(f"ERROR: US23: Individuals {' and '.join(id_list)} have the same name {name} and the same birthday {birthday}.")
+
+'''US28 Order Siblings By Age'''
+def order_siblings_by_age(individual_dict, family_dict):
+    return_list = []
+    for id, family in family_dict.items():
+        if family.chil != 'NA' and len(family.chil) > 1:
+            child_age_dict = {}
+            for child in family.chil:
+                if child in individual_dict:
+                    child_age_dict[child] = age_calculator(date.today(), individual_dict[child].birt)
+
+            copy_of_cad = child_age_dict.copy()
+            for child, age in child_age_dict.items():
+                if age == 'NA':
+                    del copy_of_cad[child]
+            sorted_child_age_list = sorted(copy_of_cad.items(), key=lambda x: x[1])
+            sorted_child_age_list.reverse()
+
+            age_sib_order_dict = {}
+
+            for item in sorted_child_age_list:
+                if item[1] not in age_sib_order_dict:
+                    age_sib_order_dict[item[1]] = [item[0]]
+                else:
+                    age_sib_order_dict[item[1]].append(item[0])
+            for age, sib in age_sib_order_dict.items():
+                sib.sort()
+            temp_return_list = []
+            if len(age_sib_order_dict) > 1:
+                for age, sibs in age_sib_order_dict.items():
+                    for sib in sibs:
+                        temp_return_list.append(sib)
+            '''List siblings in the family by decreasing age'''
+            if len(temp_return_list) > 1:
+                print(f"US28: Siblings in family {id} ordered by decreasing age is {' '.join(temp_return_list)}")
+                return_list.append(f"US28: Siblings in family {id} ordered by decreasing age is {' '.join(temp_return_list)}")
+    return return_list
 
 """Jigar's Code Goes Here"""
 '''Sprint 1'''
@@ -367,11 +428,12 @@ def unique_first_name(family_dict, individual_dict):
         if family.chil != 'NA':
             first_names = []
             for family_child in family.chil:
-                first_name = individual_dict[family_child].name.split(' ')[0]
-                if first_name not in first_names:
-                    first_names.append(first_name)
-                else:
-                    ErrorCollector.error_list.append(f"Error: US25: Family {fam_id} has multiple children with first name {first_name}.")
+                if family_child in individual_dict:
+                    first_name = individual_dict[family_child].name.split(' ')[0]
+                    if first_name not in first_names:
+                        first_names.append(first_name)
+                    else:
+                        ErrorCollector.error_list.append(f"Error: US25: Family {fam_id} has multiple children with first name {first_name}.")
 
     
 '''User Story 27: Unique first names in families'''
@@ -431,16 +493,17 @@ def siblings_spacing(family_dict, individual_dict):
             siblings = family_dict[individual.famc].chil
             if len(siblings) != 1:
                 for child in siblings:
-                    if individual_dict[child].birt.year != 'NA' and individual_dict[child].birt.month != 'NA' and individual_dict[child].birt.day != 'NA' and individual.birt.year != 'NA' and individual.birt.month != 'NA' and individual.birt.day != 'NA':
-                        sib_age = date(int(float(individual_dict[child].birt.year)), int(float(individual_dict[child].birt.month)),
-                                       int(float(individual_dict[child].birt.day)))
-                        self_age = date(int(float(individual.birt.year)), int(float(individual.birt.month)),
-                                        int(float(individual.birt.day)))
-                        difference = abs(self_age - sib_age).days
-                        '''8 months is 240 days '''
-                        #print(difference)
-                        if difference > 1 and difference < 240:
-                            ErrorCollector.error_list.append(f"ERROR: US13: {id} has a sibling whose birth date is too close")
+                    if child in individual_dict:
+                        if individual_dict[child].birt.year != 'NA' and individual_dict[child].birt.month != 'NA' and individual_dict[child].birt.day != 'NA' and individual.birt.year != 'NA' and individual.birt.month != 'NA' and individual.birt.day != 'NA':
+                            sib_age = date(int(float(individual_dict[child].birt.year)), int(float(individual_dict[child].birt.month)),
+                                           int(float(individual_dict[child].birt.day)))
+                            self_age = date(int(float(individual.birt.year)), int(float(individual.birt.month)),
+                                            int(float(individual.birt.day)))
+                            difference = abs(self_age - sib_age).days
+                            '''8 months is 240 days '''
+                            #print(difference)
+                            if difference > 1 and difference < 240:
+                                ErrorCollector.error_list.append(f"ERROR: US13: {id} has a sibling whose birth date is too close")
 
 
 """User story 14: Mutiple births <= 5"""
@@ -727,10 +790,11 @@ def corresponding_entries(family_dict, individual_dict):
                 US26_report.setdefault(id, []).append(individual_dict[wife_id].fams)
             if children != 'NA':
                 for child in children:
-                    if child != 'NA':
-                        if individual_dict[child].famc != id:
-                            ErrorCollector.error_list.append(f"ERROR: US26: family id is {id}, child {child} in family record, but in individual record, child {child} is in {individual_dict[child].famc} family")
-                    US26_report.setdefault(id, []).append(individual_dict[child].famc)
+                    if child in individual_dict:
+                        if child != 'NA':
+                            if individual_dict[child].famc != id:
+                                ErrorCollector.error_list.append(f"ERROR: US26: family id is {id}, child {child} in family record, but in individual record, child {child} is in {individual_dict[child].famc} family")
+                        US26_report.setdefault(id, []).append(individual_dict[child].famc)
 
     #print("us26", US26_report)
     return US26_report
@@ -828,6 +892,7 @@ def main():
     raw_families_to_structured_dict(families, family_dict)
 
     """User Stories Goes Here"""
+    # manual GED creation: US17, US21, US22
     '''Hanqing Sprint 1: US01, US02'''
     dates_before_current_date(individual_dict, family_dict) # US01
     birth_before_marriage(individual_dict, family_dict) # US02
@@ -837,6 +902,9 @@ def main():
     '''Hanqing Sprint 3: US09, US16'''
     birth_before_parents_death(individual_dict, family_dict) # US09
     male_last_names(individual_dict, family_dict) #US16
+    '''Hanqing Sprint 4: US23, US28'''
+    unique_name_and_birth_date(individual_dict) # US23
+    order_siblings_by_age(individual_dict, family_dict) # US28
 
     '''Jigar Sprint 1: US04, US06'''
     marriage_before_divorce(family_dict) # US04
@@ -846,7 +914,7 @@ def main():
     unique_ids(unfiltered_file) #US22
     '''Jigar Sprint 3: US25, US27'''
     unique_first_name(family_dict, individual_dict) #US25
-    # include_individual_ages(individual_dict) #US27
+    include_individual_ages(individual_dict) #US27
 
     '''Shengda Sprint 1: US05, US07'''
     marriage_before_death(family_dict, individual_dict) # US05
