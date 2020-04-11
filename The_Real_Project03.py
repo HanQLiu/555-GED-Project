@@ -343,7 +343,8 @@ def order_siblings_by_age(individual_dict, family_dict):
                         temp_return_list.append(sib)
             '''List siblings in the family by decreasing age'''
             if len(temp_return_list) > 1:
-                print(f"US28: Siblings in family {id} ordered by decreasing age is {' '.join(temp_return_list)}")
+                #print(f"US28: Siblings in family {id} ordered by decreasing age is {' '.join(temp_return_list)}")
+                ErrorCollector.error_list.append(f"US28: Siblings in family {id} ordered by decreasing age is {' '.join(temp_return_list)}")
                 return_list.append(f"US28: Siblings in family {id} ordered by decreasing age is {' '.join(temp_return_list)}")
     return return_list
 
@@ -738,6 +739,61 @@ def List_recent_deaths(individual_dict):
     #print('36', US36_report)
     return US36_report
 
+'''Sprint 4'''
+"""US 37: List all living spouses and descendants of people 
+in a GEDCOM file who died in the last 30 days"""
+def List_recent_survivors(family_dict, individual_dict):
+    US37_report = {}
+    for fam, family in family_dict.items():
+        husband_ID = family.husb
+        wife_ID = family.wife
+        children = family.chil
+        if husband_ID != 'NA' and wife_ID != 'NA':
+            husband_death_date = individual_dict[husband_ID].deat.snake_year_month_day()
+            wife_death_date = individual_dict[wife_ID].deat.snake_year_month_day()
+            if husband_death_date != 'NA' and wife_death_date == 'NA':
+                deat_datetime = datetime.datetime.strptime(husband_death_date,"%Y-%m-%d")
+                current_datetime = datetime.datetime.now()
+                dif_datetime = current_datetime - deat_datetime
+                if dif_datetime.days <= 30:
+                    US37_report.setdefault(fam, []).append([husband_death_date, wife_death_date, children])
+                    ErrorCollector.error_list.append(f"ERROR: FAMILY: US37: husband ID: {husband_ID}, death date is {husband_death_date}, "
+            f"the spouse is {wife_ID}, {children} are the descendants of husband in a GEDCOM file who died in the last 30 days")
+
+        if husband_ID != 'NA' and wife_ID != 'NA':
+            husband_death_date = individual_dict[husband_ID].deat.snake_year_month_day()
+            wife_death_date = individual_dict[wife_ID].deat.snake_year_month_day()
+            if wife_death_date != 'NA' and husband_death_date == 'NA':
+                deat_datetime = datetime.datetime.strptime(wife_death_date,"%Y-%m-%d")
+                current_datetime = datetime.datetime.now()
+                dif_datetime = current_datetime - deat_datetime
+                if dif_datetime.days <= 30:
+                    US37_report.setdefault(fam, []).append([husband_death_date, wife_death_date, children])
+                    ErrorCollector.error_list.append(f"ERROR: FAMILY: US37: wife ID: {wife_ID}, death date is {wife_death_date}, "
+            f"the spouse is {husband_ID}, {children} are the descendants of husband in a GEDCOM file who died in the last 30 days")
+    #print("37", US37_report)
+    return US37_report
+
+"""US38: List upcoming birthdays: 
+List all living people in a GEDCOM file whose birthdays occur in the next 30 days"""
+def List_upcoming_birthdays(individual_dict):
+    US38_report = {}
+    for indi, individual in individual_dict.items():
+        indi_birth_date = individual.birt.snake_year_month_day()
+        if indi_birth_date != 'NA':
+            indi_birth_datetime = datetime.datetime.strptime(indi_birth_date, "%Y-%m-%d")
+            current_datetime = datetime.datetime.now()
+            year_dif = current_datetime.year - indi_birth_datetime.year
+            month_dif = current_datetime.month - indi_birth_datetime.month
+            days_dif = current_datetime.day - indi_birth_datetime.day
+            if year_dif >= 1 and month_dif == 0 and days_dif <= 30:
+                US38_report.setdefault(indi, []).append([indi_birth_datetime, current_datetime])
+                ErrorCollector.error_list.append(
+                    f"ERROR: INDIVIDUAL: US38: individual id is: {indi}, birth date is {indi_birth_datetime}, "
+                    f"current time is {current_datetime}, is the living people in a GEDCOM file whose birthdays occur in the next 30 days")
+    #print("38", US38_report)
+    return US38_report
+
 """Xiangyu's Code Goes Here"""
 '''Sprint 1'''
 '''User Story 15: Fewer Than 150 Siblings'''
@@ -765,7 +821,8 @@ def unique_families_by_spouses(family_dict, individual_dict):
 
             if marriage_date != 'NA':
                 if marriage_date in US24_report.keys():
-                    if US24_report[marriage_date][0] == husband_name                        or US24_report[marriage_date][1] == wife_name:
+                    if US24_report[marriage_date][0] == husband_name\
+                            or US24_report[marriage_date][1] == wife_name:
                         ErrorCollector.error_list.append(f"ERROR: US24: family id is {fam}, husband name  is {husband_name}, "
                                                          f"wife name is {wife_name}, marriage date is {marriage_date}, is not unique Families By Spouses")
                 else:
@@ -857,6 +914,44 @@ def list_large_age_differences(family_dict, individual_dict):
     #print('34', US34_report)
     return US34_report
 
+'''Sprint 4'''
+"""US39: List all living couples 
+in a GEDCOM file whose marriage anniversaries occur in the next 30 days"""
+def List_upcoming_anniversaries(family_dict):
+    US39_report = {}
+
+    for fam, family in family_dict.items():
+        husband_ID = family.husb
+        wife_ID = family.wife
+        if husband_ID != 'NA' and wife_ID != 'NA':
+            marriage_date = family.marr.snake_year_month_day()
+            if marriage_date != 'NA':
+                marriage_datetime = datetime.datetime.strptime(marriage_date, "%Y-%m-%d")
+                current_datetime = datetime.datetime.now()
+                year_dif = current_datetime.year - marriage_datetime.year
+                month_dif = current_datetime.month - marriage_datetime.month
+                days_dif = current_datetime.day - marriage_datetime.day
+                if year_dif >= 1 and month_dif == 0 and days_dif <= 30:
+                    US39_report.setdefault(fam, []).append([husband_ID, wife_ID])
+                    ErrorCollector.error_list.append(f"ERROR: FAMILY: US39: Family ID: {fam}, husband's ID is {husband_ID}, "
+                    f"wife's ID is {wife_ID}, whose marriage anniversaries occur in the next 30 days.")
+    print("39", US39_report)
+    return US39_report
+
+"""US40: Include input line numbers 
+List line numbers from GEDCOM source file when reporting errors"""
+def Include_input_line_numbers(list):
+    US40_report = {}
+    for error_string in list:
+        string_list = error_string.split(":")
+        for us_id in string_list:
+            if us_id.strip().upper().startswith("US"):
+                id = us_id[2:]
+                US40_report[id] = US40_report.get(id, 0) + 1
+    for id, cnt in US40_report.items():
+        ErrorCollector.error_list.append(f"ERROR: US40: User Story ID is {id}, the numbers of the errors are {cnt}")
+    #print("40", US40_report)
+    return US40_report
 """Main Function"""
 def main():
     '''Operations in Order'''
@@ -925,6 +1020,9 @@ def main():
     '''shengda Sprint 3: US35, US36'''
     List_recent_births(individual_dict)
     List_recent_deaths(individual_dict)
+    '''shengda Sprint 4: US37, US38'''
+    List_recent_survivors(family_dict, individual_dict)
+    List_upcoming_birthdays(individual_dict)
 
     '''Haoran Sprint 1: US11, US12'''
     no_bigamy(family_dict, individual_dict) # US11
@@ -945,6 +1043,9 @@ def main():
     '''Xiangyu Sprint 3: US33, US34'''
     list_orphans(family_dict, individual_dict)
     list_large_age_differences(family_dict, individual_dict)
+    '''Xiangyu Sprint 4: US39, US40'''
+    List_upcoming_anniversaries(family_dict)
+    Include_input_line_numbers(ErrorCollector.error_list)
 
 
     '''Uncomment these if you want to see the individual and family objects created from Individual and Family class'''
