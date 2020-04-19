@@ -445,6 +445,57 @@ def include_individual_ages(individual_dict):
     for item in id_age_list:
         print(item)
 
+                                   
+'''Sprint 4'''
+'''User Story 29: List deceased'''
+
+
+def list_deceased(individual_dict):
+    deceased_list = {}
+
+    for indi, individual in individual_dict.items():
+        indi_death_date = individual.deat.snake_year_month_day()
+        if indi_death_date != 'NA':
+            string_date_list = indi_death_date.split('-')
+            year = int(string_date_list[0])
+            month = int(string_date_list[1])
+            day = int(string_date_list[2])
+            current_time = datetime.datetime.now()
+            death_date = datetime.datetime(year, month, day)
+            difference_days = (current_time - death_date).days
+            if difference_days <= 999999999999:
+                deceased_list.setdefault(indi, []).extend([death_date, current_time])
+
+    for id, date in deceased_list.items():
+        ErrorCollector.error_list.append(f"INDIVIDUAL: US29: Individual ID: {id}, with death date {date[0]}, "
+                                         f"is a person who has died.")
+
+    return deceased_list
+
+
+'''User Story 30: List living married'''
+
+
+def list_living_married(family_dict, individual_dict):
+    living_married = {}
+
+    for fam, family in family_dict.items():
+        hid = family.husb
+        wid = family.wife
+        children = family.chil
+        if hid != 'NA' and wid != 'NA':
+            husband_death_date = individual_dict[hid].deat.snake_year_month_day()
+            wife_death_date = individual_dict[wid].deat.snake_year_month_day()
+            if husband_death_date != 'NA' and wife_death_date == 'NA':
+                deat_datetime = datetime.datetime.strptime(husband_death_date, "%Y-%m-%d")
+                current_datetime = datetime.datetime.now()
+                dif_datetime = current_datetime - deat_datetime
+                if dif_datetime.days <= 9999999999:
+                    living_married.setdefault(fam, []).append([husband_death_date, wife_death_date, children])
+                    ErrorCollector.error_list.append(f"FAMILY: US30: Husband:{hid} and Wife:{wid} are married and living. ")
+
+    return living_married
+                                   
     
 """Haoran's Code Goes Here"""
 '''Sprint 1'''
@@ -1010,6 +1061,9 @@ def main():
     '''Jigar Sprint 3: US25, US27'''
     unique_first_name(family_dict, individual_dict) #US25
     include_individual_ages(individual_dict) #US27
+    '''Jigar Sprint 4: US29, US30'''
+    list_deceased(individual_dict)  #US29
+    list_living_married(family_dict, individual_dict)  #US30                               
 
     '''Shengda Sprint 1: US05, US07'''
     marriage_before_death(family_dict, individual_dict) # US05
