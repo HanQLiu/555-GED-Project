@@ -898,6 +898,9 @@ def main():
     '''Jigar Sprint 3: US25, US27'''
     unique_first_name(family_dict, individual_dict) #US25
     include_individual_ages(individual_dict) #US27
+    '''Jigar Sprint 4: US29, US30'''
+    list_deceased(individual_dict)  #US29
+    list_living_married(family_dict, individual_dict)  #US30
 
     '''Shengda Sprint 1: US05, US07'''
     marriage_before_death(family_dict, individual_dict) # US05
