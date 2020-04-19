@@ -2,32 +2,28 @@ import unittest
 import The_Real_Project03
 
 
-class TestUS25US27(unittest.TestCase):
+class TestUS25(unittest.TestCase):
 
-    incorrect_ind = {
-            '@I1@': {'NAME': ['Adam /Levine/', 17], 'SEX': ['M', 21], 'BIRT_DATE': ['1964-02-25', 23],
-                     'DEAT_DATE': ['2001-01-31', 25], 'FAMC': [['@F1@', 26]], 'ALIVE': 'False', 'FAMS': 'NA'},
-            '@I2@': {'NAME': ['Adam /Levine/', 27], 'SEX': ['F', 21], 'BIRT_DATE': ['1964-02-25', 23],
-                     'DEAT_DATE': ['NA', 25], 'FAMC': [['@F1@', 26]], 'ALIVE': 'True', 'FAMS': 'NA'}
-        }
-    incorrect_fam = {
-            '@F1@': {'HUSB': ['@I10@', 139], 'WIFE': ['@I12@', 140], 'CHIL': [['@I1@', 194], ['@I2@', 195]],
-                     'MARR_DATE': ['1995-03-02', 143], 'DIV_DATE': ['1972-03-28', 153]}
-        }
-    correct_ind = {
-            '@I1@': {'NAME': ['Adam /Levine/', 17], 'SEX': ['M', 21], 'BIRT_DATE': ['1964-02-25', 23],
-                     'DEAT_DATE': ['2001-01-31', 25], 'FAMC': [['@F1@', 26]], 'ALIVE': 'False', 'FAMS': 'NA'},
-            '@I2@': {'NAME': ['Suzie /Levine/', 27], 'SEX': ['F', 21], 'BIRT_DATE': ['1974-01-5', 23],
-                     'DEAT_DATE': ['NA', 25], 'FAMC': [['@F1@', 26]], 'ALIVE': 'True', 'FAMS': 'NA'}
-        }
-    correct_fam = {
-            '@F1@': {'HUSB': ['@I10@', 139], 'WIFE': ['@I12@', 140], 'CHIL': [['@I1@', 194], ['@I2@', 195]],
-                     'MARR_DATE': ['1995-03-02', 143], 'DIV_DATE': ['1972-03-28', 153]}
-        }
+    file_path = '555Project(updates-often).ged'
+    individuals = {}
+    families = {}
+    with open(file_path, 'r') as file:
+        unfiltered_file = file.readlines()
+        The_Real_Project03.filter_file(unfiltered_file, individuals, families)
+    individual_dict = {}
+    family_dict = {}
+    The_Real_Project03.raw_individuals_to_structured_dict(individuals, individual_dict)
+    The_Real_Project03.raw_families_to_structured_dict(families, family_dict)
 
     def test_US25(self):
-        self.assertFalse(The_Real_Project03.unique_first_name(self.incorrect_ind, self.incorrect_fam))
+        error_report = The_Real_Project03.main()
+        exp1 = "Error: US25: Family @F2@ has multiple children with first name US23."
 
-  
+        self.assertIn(exp1, error_report.error_list)
+
+
 if __name__ == '__main__':
     unittest.main(exit=False, verbosity=2)
+
+
+
