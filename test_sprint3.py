@@ -21,9 +21,14 @@ class TestUS25(unittest.TestCase):
 
         self.assertIn(exp1, error_report.error_list)
 
+    def test_US27(self):
+        error_report = The_Real_Project03.main()
+        exp1 = "INDIVIDUAL: US27: Individual ID: @I1@ is 60 years old."
+
+        self.assertIn(exp1, error_report.error_list)
+
 
 if __name__ == '__main__':
     unittest.main(exit=False, verbosity=2)
-
 
 
