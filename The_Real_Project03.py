@@ -375,12 +375,11 @@ def unique_first_name(family_dict, individual_dict):
 
     
 '''User Story 27: Unique first names in families'''
-def include_individual_ages(individual_dict):
     id_age_list = []
     for id, individual in individual_dict.items():
-        id_age_list.append(f"{id} is {age_calculator(date.today(), individual.birt)} years old.")
-        for item in id_age_list:
-            print(item)
+        ErrorCollector.error_list.append(f"INDIVIDUAL: US27: Individual ID: {id} is {age_calculator(date.today(), individual.birt)} years old.")
+    for item in id_age_list:
+        print(item)
             
 '''Sprint 4'''
 '''User Story 29: List deceased'''
