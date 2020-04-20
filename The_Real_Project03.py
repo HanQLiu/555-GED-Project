@@ -629,6 +629,49 @@ def first_cousin_not_marry(family_dict, individual_dict):
                         ErrorCollector.error_list.append(f"ERROR: US19: {id} should not marry his cousin {partnerid}")
                         break
 
+                                   
+'''Sprint 4'''
+'''User Story 20 : Aunts and Uncle'''
+
+
+def Aunts_Uncles(family_dict, individual_dict):
+    for id, individual in individual_dict.items():
+        partner = 'NA'
+        if individual.famc != 'NA' and individual.fams != 'NA':
+            if individual.sex == 'M':
+                partnerid = family_dict[individual.fams].wife
+            else:
+                partnerid = family_dict[individual.fams].husb
+            if partnerid != 'NA':
+                partner = individual_dict[partnerid]
+                motherid = family_dict[individual.famc].wife
+                if motherid != 'NA':
+                    mother = individual_dict[motherid]
+                    if partner.famc == mother.famc:
+                        ErrorCollector.error_list.append(
+                            f"ERROR: US20: {id} should not marry his aunt or uncle {partnerid}")
+                fatherid = family_dict[individual.famc].husb
+                if fatherid != 'NA':
+                    father = individual_dict[fatherid]
+                    if partner.famc == mother.famc:
+                        ErrorCollector.error_list.append(
+                            f"ERROR: US20: {id} should not marry his aunt or uncle {partnerid}")
+
+
+'''User Story 21 : Correct gender for role'''
+
+
+def Correct_gender(family_dict, individual_dict):
+    for id, individual in individual_dict.items():
+        if individual.fams != 'NA':
+            if individual.sex == 'M':
+                selfID = family_dict[individual.fams].husb
+            else:
+                selfID = family_dict[individual.fams].wife
+            if individual != individual_dict[selfID]:
+                ErrorCollector.error_list.append(f"ERROR: US21: {id} gender is not correct")
+
+                                  
 
 """Shengda's Code Goes Here"""
 '''Sprint 1'''
@@ -1086,6 +1129,9 @@ def main():
     '''Haoran Sprint 3: US18, US19'''
     sibling_not_marry(family_dict, individual_dict) # US18
     first_cousin_not_marry(family_dict, individual_dict) # US19
+    '''Haoran Sprint 3: US20, US21'''
+    Aunts_Uncles(family_dict, individual_dict)  #20
+    Correct_gender(family_dict, individual_dict)  #21                               
 
     '''Xiangyu Sprint 1: US15, US24'''
     fewer_than_15_siblings(family_dict) # US15
