@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[37]:
-
-
 """The Brand New Project 03 With Better Data Structure And Better Visual"""
 """Please Make Code As Minimalist As Possible"""
 from prettytable import PrettyTable
@@ -493,7 +487,40 @@ def first_cousin_not_marry(family_dict, individual_dict):
                         ErrorCollector.error_list.append(f"ERROR: US19: {id} should not marry his cousin {partnerid}")
                         break
 
-
+'''Sprint 4'''
+'''User Story 20 : Aunts and Uncle'''
+def Aunts_Uncles(family_dict, individual_dict):
+    for id, individual in individual_dict.items():
+        partner = 'NA'
+        if individual.famc != 'NA' and individual.fams != 'NA':
+            if individual.sex == 'M':
+                partnerid = family_dict[individual.fams].wife
+            else:
+                partnerid = family_dict[individual.fams].husb
+            if partnerid != 'NA':
+                partner = individual_dict[partnerid]
+                motherid = family_dict[individual.famc].wife
+                if motherid != 'NA':
+                    mother = individual_dict[motherid]
+                    if partner.famc == mother.famc:
+                        ErrorCollector.error_list.append(f"ERROR: US20: {id} should not marry his aunt or uncle {partnerid}")
+                fatherid = family_dict[individual.famc].husb
+                if fatherid != 'NA':
+                    father = individual_dict[fatherid]
+                    if partner.famc == mother.famc:
+                        ErrorCollector.error_list.append(f"ERROR: US20: {id} should not marry his aunt or uncle {partnerid}")
+                
+'''User Story 21 : Correct gender for role'''
+def Correct_gender(family_dict, individual_dict):
+    for id, individual in individual_dict.items():
+        if individual.fams != 'NA':
+            if individual.sex == 'M':
+                selfID = family_dict[individual.fams].husb
+            else:
+                selfID = family_dict[individual.fams].wife
+            if individual != individual_dict[selfID]:
+                ErrorCollector.error_list.append(f"ERROR: US21: {id} gender is not correct")
+            
 """Shengda's Code Goes Here"""
 '''Sprint 1'''
 '''User Story 05: Marriage Before Death'''
@@ -564,7 +591,8 @@ def marriage_after_14(family_dict, individual_dict):
             husband_birth_day = individual_dict[husband_ID].birt.snake_year_month_day()
             wife_birth_day = individual_dict[wife_ID].birt.snake_year_month_day()
 
-            if calculate_year_dif(husband_birth_day, marriage_date) >= 14                and calculate_year_dif(wife_birth_day, marriage_date) >= 14:
+            if calculate_year_dif(husband_birth_day, marriage_date) >= 14\
+                and calculate_year_dif(wife_birth_day, marriage_date) >= 14:
                 US10_report[fam] = True
             else:
                 US10_report[fam] = [marriage_date, husband_birth_day, wife_birth_day]
@@ -680,7 +708,8 @@ def unique_families_by_spouses(family_dict, individual_dict):
 
             if marriage_date != 'NA':
                 if marriage_date in US24_report.keys():
-                    if US24_report[marriage_date][0] == husband_name                        or US24_report[marriage_date][1] == wife_name:
+                    if US24_report[marriage_date][0] == husband_name\
+                        or US24_report[marriage_date][1] == wife_name:
                         ErrorCollector.error_list.append(f"ERROR: US24: family id is {fam}, husband name  is {husband_name}, "
                                                          f"wife name is {wife_name}, marriage date is {marriage_date}, is not unique Families By Spouses")
                 else:
@@ -807,51 +836,54 @@ def main():
 
     """User Stories Goes Here"""
     '''Hanqing Sprint 1: US01, US02'''
-    dates_before_current_date(individual_dict, family_dict) # US01
-    birth_before_marriage(individual_dict, family_dict) # US02
+    #dates_before_current_date(individual_dict, family_dict) # US01
+    #birth_before_marriage(individual_dict, family_dict) # US02
     '''Hanqing Sprint 2: US03, US08'''
-    birth_before_death(individual_dict) # US03
-    birth_before_marriage_of_parents(individual_dict, family_dict) # US08
+    #birth_before_death(individual_dict) # US03
+    #birth_before_marriage_of_parents(individual_dict, family_dict) # US08
     '''Hanqing Sprint 3: US09, US16'''
-    birth_before_parents_death(individual_dict, family_dict) # US09
-    male_last_names(individual_dict, family_dict) #US16
+    #birth_before_parents_death(individual_dict, family_dict) # US09
+    #male_last_names(individual_dict, family_dict) #US16
 
     '''Jigar Sprint 1: US04, US06'''
-    marriage_before_divorce(family_dict) # US04
-    divorce_before_death(family_dict, individual_dict) # US06
+    #marriage_before_divorce(family_dict) # US04
+    #divorce_before_death(family_dict, individual_dict) # US06
     '''Jigar Sprint 2: US17, US22'''
-    no_marriage_to_children(family_dict, individual_dict) # US17
-    unique_ids(unfiltered_file) #US22
+    #no_marriage_to_children(family_dict, individual_dict) # US17
+    #unique_ids(unfiltered_file) #US22
 
     '''Shengda Sprint 1: US05, US07'''
-    marriage_before_death(family_dict, individual_dict) # US05
-    less_than_150_years_old(individual_dict) # US07
+    #marriage_before_death(family_dict, individual_dict) # US05
+    #less_than_150_years_old(individual_dict) # US07
     '''Shengda Sprint 2: US10, US31'''
-    marriage_after_14(family_dict, individual_dict) # US10
-    list_living_single(family_dict, individual_dict) # US31
+    #marriage_after_14(family_dict, individual_dict) # US10
+    #list_living_single(family_dict, individual_dict) # US31
     '''shengda Sprint 3: US35, US36'''
-    List_recent_births(individual_dict)
-    List_recent_deaths(individual_dict)
+    #List_recent_births(individual_dict)
+    #List_recent_deaths(individual_dict)
 
     '''Haoran Sprint 1: US11, US12'''
-    no_bigamy(family_dict, individual_dict) # US11
-    parents_not_too_old(family_dict, individual_dict) # US12
+    #no_bigamy(family_dict, individual_dict) # US11
+    #parents_not_too_old(family_dict, individual_dict) # US12
     '''Haoran Sprint 2: US13, US14'''
-    siblings_spacing(family_dict, individual_dict) # US13
-    mutiple_birth(family_dict, individual_dict) # US14
+    #siblings_spacing(family_dict, individual_dict) # US13
+    #mutiple_birth(family_dict, individual_dict) # US14
     '''Haoran Sprint 3: US18, US19'''
-    sibling_not_marry(family_dict, individual_dict) # US18
-    first_cousin_not_marry(family_dict, individual_dict) # US19
+    #sibling_not_marry(family_dict, individual_dict) # US18
+    #first_cousin_not_marry(family_dict, individual_dict) # US19
+    '''Haoran Sprint 4: US20, US21'''
+    Aunts_Uncles(family_dict, individual_dict)
+    Correct_gender(family_dict, individual_dict)
 
     '''Xiangyu Sprint 1: US15, US24'''
-    fewer_than_15_siblings(family_dict) # US15
-    unique_families_by_spouses(family_dict, individual_dict) # US24
+    #fewer_than_15_siblings(family_dict) # US15
+    #unique_families_by_spouses(family_dict, individual_dict) # US24
     '''Xiangyu Sprint 2: US26, US32'''
-    corresponding_entries(family_dict, individual_dict) # US26
-    list_multiple_births(individual_dict) # US32
+    #corresponding_entries(family_dict, individual_dict) # US26
+    #list_multiple_births(individual_dict) # US32
     '''Xiangyu Sprint 3: US33, US34'''
-    list_orphans(family_dict, individual_dict)
-    list_large_age_differences(family_dict, individual_dict)
+    #list_orphans(family_dict, individual_dict)
+    #list_large_age_differences(family_dict, individual_dict)
 
 
     '''Uncomment these if you want to see the individual and family objects created from Individual and Family class'''
@@ -875,16 +907,3 @@ def main():
 """Run Main Function"""
 if __name__ == '__main__':
     main()
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
