@@ -1028,7 +1028,7 @@ def List_upcoming_anniversaries(family_dict):
                     US39_report.setdefault(fam, []).append([husband_ID, wife_ID])
                     ErrorCollector.error_list.append(f"ERROR: FAMILY: US39: Family ID: {fam}, husband's ID is {husband_ID}, "
                     f"wife's ID is {wife_ID}, whose marriage anniversaries occur in the next 30 days.")
-    print("39", US39_report)
+    #print("39", US39_report)
     return US39_report
 
 """US40: Include input line numbers 
@@ -1038,11 +1038,12 @@ def Include_input_line_numbers(list):
     for error_string in list:
         string_list = error_string.split(":")
         for us_id in string_list:
-            if us_id.strip().upper().startswith("US"):
-                id = us_id[2:]
+            real_id = us_id.strip().upper()
+            if real_id.startswith("US"):
+                id = real_id[2:]
                 US40_report[id] = US40_report.get(id, 0) + 1
     for id, cnt in US40_report.items():
-        ErrorCollector.error_list.append(f"ERROR: US40: User Story ID is {id}, the numbers of the errors are {cnt}")
+        ErrorCollector.error_list.append(f"US40: User Story ID is {id}, the numbers of the errors are {cnt}")
     #print("40", US40_report)
     return US40_report
 """Main Function"""
@@ -1129,7 +1130,7 @@ def main():
     '''Haoran Sprint 3: US18, US19'''
     sibling_not_marry(family_dict, individual_dict) # US18
     first_cousin_not_marry(family_dict, individual_dict) # US19
-    '''Haoran Sprint 3: US20, US21'''
+    '''Haoran Sprint 4: US20, US21'''
     Aunts_Uncles(family_dict, individual_dict)  #20
     Correct_gender(family_dict, individual_dict)  #21                               
 
